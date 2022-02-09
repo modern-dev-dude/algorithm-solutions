@@ -18,6 +18,7 @@ class BST {
 
   function validateBst(tree) {
     // Write your code here.
+    // only works if first node is valid
       return traverseBst(tree, -Infinity, Infinity)
   }
   

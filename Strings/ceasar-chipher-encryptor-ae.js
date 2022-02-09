@@ -7,7 +7,6 @@ function caesarCipherEncryptor(string, key) {
   // Write your code here.
 	let res = '';
 	key = (key > 25)? Math.floor(key % 26)  : key
-	console.log(key)
 	for(let i =0; i < string.length; i++){
 		const newLetterCode = string.charCodeAt(i) + key;
 		res += (newLetterCode <= 122)?  String.fromCharCode(newLetterCode): String.fromCharCode(96 + (newLetterCode % 122 )) 
