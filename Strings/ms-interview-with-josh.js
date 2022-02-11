@@ -1,80 +1,81 @@
 "use strict";
 // Complexity O(n+m)
 // only touch each element of each string once
-
-function lookForMatchingSubstr(subStrToMatch, strToSearch) {
-    const mapOfLettersToFind = new Map(); //max occurances of values in substring
-    const mapToStoreFoundStrings = new Map(); // current occurances
-    let numberOfSolutionsFound = 0;
-  
-    // build map of keys
+// Complexity O(n+m)
+// only touch each element of each string once
+// sliding window approach
+function anagramSearchInStringWithSlidingWindow(subStrToMatch, strToSearch){
+    const maxOccurranceMap = new Map(); // max occurances of values in substring
+    const lengthOfSubstring = subStrToMatch.length;
+    let countOfKeysInSubStrMatch = 0;
+    // build map of max occurences
     for (let i = 0; i < subStrToMatch.length; i++) {
       //set a map of each letter max occurances
-      let itemInMap = mapOfLettersToFind.get(subStrToMatch[i]);
+      let itemInMap = maxOccurranceMap.get(subStrToMatch[i]);
       if (itemInMap === undefined) {
-        mapOfLettersToFind.set(subStrToMatch[i], 1);
+        maxOccurranceMap.set(subStrToMatch[i], 1);
+        countOfKeysInSubStrMatch++;
       } else {
-        mapOfLettersToFind.set(subStrToMatch[i], itemInMap + 1);
+        maxOccurranceMap.set(subStrToMatch[i], itemInMap + 1);
       }
     }
   
-    let countOfItemsFound = 0;
-    for (let i = 0; i < strToSearch.length; i++) {
-        let lookForMatch = mapToStoreFoundStrings.get(strToSearch[i]) ?? 0;
-        let currCharMaxOccurances = mapOfLettersToFind.get(strToSearch[i]);
-        // check if item found is an item in the substring
-        // check if the current amount see < currCharMaxOccurances a: 0 -> a:1
-        // if true add item to mapToStoreFoundStrings and increment the amount of result
-        // check for solution by comparing count of found to substring length
-        if (currCharMaxOccurances === undefined) {
-          mapToStoreFoundStrings.clear();
-          countOfItemsFound = 0;
-          continue;
-        } else if ( currCharMaxOccurances !== undefined && lookForMatch < currCharMaxOccurances) {
-          countOfItemsFound++;
-          let newCountOfFoundItem = lookForMatch + 1;
-          mapToStoreFoundStrings.set(strToSearch[i], newCountOfFoundItem);
-          if (countOfItemsFound === subStrToMatch.length){
-              mapToStoreFoundStrings.clear();
-              countOfItemsFound = 0;
-              numberOfSolutionsFound++;
-              continue;
-          }
-        // if curent max occurences is met before I add to current occurnces 
-        // i.e. aaaabbbccb
-        // then I know there is three in row 
-        // clear the current found occurences 
-        // set the curr item and occurences back in map and continue
-        } else if(currCharMaxOccurances === lookForMatch){
-          if(strToSearch[i] === strToSearch[i - currCharMaxOccurances]){
-            mapToStoreFoundStrings.clear();
-            mapToStoreFoundStrings.set(strToSearch[i], currCharMaxOccurances);
-            countOfItemsFound = currCharMaxOccurances;
-          }
-         
-        }
+    let numOfValidSubstrings = 0;
+    let resultIdx = [];
+    let startIdxOfWindow = 0;
+    let matched = 0;
+    for (let i = 0; i < strToSearch.length ; i++) {
+  
+      const rightSideOfWindow = strToSearch[i];
+      if(maxOccurranceMap.get(rightSideOfWindow) !== undefined){
+        maxOccurranceMap.set(rightSideOfWindow, maxOccurranceMap.get(rightSideOfWindow)- 1);
+          if (maxOccurranceMap.get(rightSideOfWindow)  === 0) {
+              matched++;
+           }
       }
-    document.getElementById("root").innerHTML = `<p>String to search in: ${strToSearch}</p><p>Substring to match : ${subStrToMatch}</p><p>Number of Solutions Found : ${numberOfSolutionsFound}</p>`;
+      // we could set the start indexes or num of valid results
+      if(matched === countOfKeysInSubStrMatch){
+          resultIdx[resultIdx.length] = startIdxOfWindow;
+          numOfValidSubstrings++;
+      }
+      // move window to left as needed
+      if(i >= lengthOfSubstring - 1){
+          // move window left
+          let leftChar = strToSearch[startIdxOfWindow];
+          startIdxOfWindow++;
+          const leftCharOccurences = maxOccurranceMap.get(leftChar); 
+          if(leftCharOccurences !== undefined){
+              if(leftCharOccurences === 0){
+              matched--;
+              }
+              maxOccurranceMap.set(leftChar, leftCharOccurences + 1)
+          }
+      }
+    }
+    console.log("resultIdx : " , resultIdx);
+    console.log("numOfValidSubstrings : " , numOfValidSubstrings);
+    document.getElementById(
+      "root"
+    ).innerHTML = `<p>String to search in: ${strToSearch}</p><p>Substring to match : ${subStrToMatch}</p><p>Number of Solutions Found : ${numOfValidSubstrings}</p>`;
   }
   
-  /**
-  * Test cases used
-  * uncomment out one at a time and answer appears on dom
-  */
-  lookForMatchingSubstr("bbac", "abbadadbacdfdfacbbdaaabcba"); // sets dom to 2
-  // lookForMatchingSubstr('bbac', 'aaaaaaaaaaaaaaaaaaaaabbbccccabcb'); // sets dom to 1
-  // lookForMatchingSubstr('bbac', 'aaaaaaaaaaaaaaaaaaaaabbbcacccabcb'); // sets dom to 2
-  // lookForMatchingSubstr('bbac', 'aaaaaaaaaaaaaaaaaaaaabbb'); // sets dom to 0
-  // lookForMatchingSubstr('bbac', 'abc'); // sets dom to 0
-  // lookForMatchingSubstr('bbac', 'abcc'); // sets dom to 1
-  // lookForMatchingSubstr('bbac', 'abbc'); // sets dom to 1
   
-
+  /**
+   * Test cases used
+   * uncomment out one at a time and answer appears on dom
+   */
+  anagramSearchInStringWithSlidingWindow("bbac", "abbadadbacdfdfacbbdaaabcba"); // sets dom to 2
+  // anagramSearchInStringWithSlidingWindow("bbac", "aaaaaaaaaaaaaaaaaaaaabbbccccabcb"); // sets dom to 1
+  // anagramSearchInStringWithSlidingWindow('bbac', 'abc'); // sets dom to 0
+  // anagramSearchInStringWithSlidingWindow('bbac', 'abcc'); // sets dom to 1
+  // anagramSearchInStringWithSlidingWindow('bbaac', 'bcaacb'); // sets dom to 0
+    
 
 // subStrToMatch = "bbac"          <--- size is m
 // strToTest     = "abbadadbacdfdf[acbb]daa[abcb]a"   <---- size is n
 //                  ^
 // strToTest     = "abbadadbacdfdf[acbb]daa[abcb]a"
+//abbadadbacdfdfacbbdaaabcba
 //                   ^  
 // O(nxm)
 
