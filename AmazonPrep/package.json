@@ -10,8 +10,5 @@
   "license": "MIT",
   "bin": {
     "multiplesOfThreeOrFive": "./bin/multiplesOfThreeOrFive.js"
-  },
-  "dependencies": {
-    "yargs": "^13.2.4"
   }
 }
