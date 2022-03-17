@@ -1,0 +1,17 @@
+{
+  "name": "amazonprep",
+  "version": "1.0.0",
+  "description": "node server to test solutions",
+  "main": "index.js",
+  "scripts": {
+    "test":"node ./index.js"
+  },
+  "author": "Jason Stoddard",
+  "license": "MIT",
+  "bin": {
+    "multiplesOfThreeOrFive": "./bin/multiplesOfThreeOrFive.js"
+  },
+  "dependencies": {
+    "yargs": "^13.2.4"
+  }
+}
