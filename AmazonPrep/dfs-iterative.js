@@ -1,71 +1,81 @@
-const testMatrix = [ 
-  ['A','R','S','E'],
-  ['C','O','C','K'],
-  ['F','U','C','K']
-]
-const testWordToSearch = ['R','O','C','K']
-// insert first item into stack
-// while stack is bot empty iterate 
-// 
-function dfsIterative(graphToSearch, wordToSearch){
-  if(!graphToSearch) return false;
-  if(graphToSearch.length === 0) return false;
-  // pairs to check adjecent items 
-  const adjRows = [0, -1, 1, 1, 0, -1, -1, -1 ];
-  const adjCols = [-1, -1, 0, 1, 1, 1, 0, -1 ];
-  const stackForBacktracking = new Array();
-  // load first vertex into stack (start point)
-  const visitedSpots = createVisitedMatrix(graphToSearch, wordToCheck);
-  const rowLength = graphToSearch.length
-  const colLength = graphToSearch[0].length
-  let row = 0;
-  let col = 0;
-  stackForBacktracking.push(graphToSearch[row][col]);
-  try{
-    while (row < rowLength  ){
-      if(!visitedSpots[row][col]){
-        console.log('graphToSearch[row][col] == ', graphToSearch[row][col])
-        visitedSpots[row][col] = true;
+
+const testDictionary = ['ROCK', 'FOR', 'asdasd']
+const  loggerStringArgBuilder = (key, val) => `${key} == ${val}` 
+
+function checkFoSolution(boggleBoard, wordDictionary){
+  let solutions = []
+  for(let wrdIdx = 0; wrdIdx < wordDictionary.length; wrdIdx++){
+    // checks every item in graph
+    for(let i = 0; i < boggleBoard.length; i++){
+      let currSolutionLength = solutions.length;
+      // traverse rows 
+      for(let k = 0; k < boggleBoard.length; k++){
+        // traverse cols 
+        let isMatch = dfsIterative(boggleBoard, wordDictionary[wrdIdx], i, k);
+        // logger(`Char at ${i}, ${k}`, isMatch)
+        if (isMatch){
+          solutions.push(wordDictionary[wrdIdx]);
+          break;
+        }
       }
-      for (let i = 0; i < adjRows.length; i++) {
-          const itemAdjX = row + adjRows[i];
-          const itemAdjY= col + adjCols[i];
-          // account for items out of bounds
-          if( itemAdjX < 0 || itemAdjY < 0 || itemAdjX >= graphToSearch.length || itemAdjY >= graphToSearch[0].length) continue
-         
-        
+      if(solutions.length > currSolutionLength){
+        break;
       }
-      
-      // run through stack to search adjecent items
-      // while(stackForBacktracking.length !== 0){
-      //   // do somthing with stack
-      //   const itemToSearch = stackForBacktracking.pop();
-      //   for (let i = 0; i < adjRows.length; i++) {
-      //     const itemAdjX = row + adjRows[i];
-      //     const itemAdjY= col + adjCols[i];
-      //     // account for items out of bounds
-      //     if( itemAdjX < 0 || itemAdjY < 0 || itemAdjX >= graphToSearch.length || itemAdjY >= graphToSearch[0].length) continue
-      //       stackForBacktracking.push(graphToSearch[itemAdjX][itemAdjY]);
-      //   }
-      // }
- 
-       if(col < colLength ){
-        col++;
-      }
-      if(row < rowLength && col === colLength ) {
-        col = 0;
-        row++;
-      } 
-      // to print only once in the event the item has been visited 
-    
     }
-  }catch(err){
-    console.log(err)
-    console.log(' row',  row)
-    console.log(' col',  col)
   }
+  logger(
+    loggerStringArgBuilder('solutions', solutions),
+    loggerStringArgBuilder('solutions.length', solutions.length),
+  )
+  return solutions.length > 0;
 }
 
+function dfsIterative(graphToSearch, wordToSearch,  startRow, startCol){
+  const adjRows = [0, -1, 1, 1, 0, -1, -1, -1 ];
+  const adjCols = [-1, -1, 0, 1, 1, 1, 0, -1 ];
+  let currGraphRow = startRow;
+  let currGraphCol = startCol;
+  let currCharIdx = 0;
+  let currCharInWordToCheck = wordToSearch.charAt(currCharIdx); 
+  let currCharInGraph = graphToSearch[startRow][startCol];
+  const visistedSpots = createVisitedMatrix(graphToSearch);
+  visistedSpots[startRow][startCol] = true;
+  if(currCharInGraph !== currCharInWordToCheck){
+        return false;
+  }else {
+    // found first Char now increment for second and check adj chars
+    currCharIdx++;
+    currCharInWordToCheck = wordToSearch.charAt(currCharIdx); 
+      // check adjency for match
+      for(let k =0; k< adjRows.length; k++){
+        const adjRowLocation = adjRows[k] + currGraphRow;
+        const adjColLocation = adjCols[k] + currGraphCol;
+        // handle out of bounds exceptions in graph 
+        if( graphToSearch[adjRowLocation] === undefined || graphToSearch[adjRowLocation][adjColLocation] === undefined) continue; 
+
+        // check for matches 
+        const currCharAdjToGraphLocation = graphToSearch[adjRowLocation][adjColLocation];
+        // skip previously used node
+        if(visistedSpots[adjRowLocation][adjColLocation]){
+          continue;
+        }
+       
+        if(currCharAdjToGraphLocation === currCharInWordToCheck){
+          // recet adj char in loop for next char
+          k = 0;
+          currGraphRow = adjRowLocation;
+          currGraphCol = adjColLocation;
+          visistedSpots[adjRowLocation][adjColLocation] = true;
+          currCharIdx++;
+          currCharInWordToCheck= wordToSearch.charAt(currCharIdx); 
+          if(currCharIdx === wordToSearch.length) return true;
+        }
+      }
+      // if no match in adj then return false 
+      return false;
+ // }
+  }
+}
 /**
  * Creates a matrix of false values to keep track of visited vertexes 
  * N X N size (square)
@@ -85,4 +95,30 @@ function createVisitedMatrix(graphToSearch){
   return matrixToReturn;
 }
 
-dfsIterative(testCaseOne, testWordToSearch)
+checkFoSolution(buildRandomBoard(), testDictionary)
+
+/**
+ * 
+ * @param {number} size 
+ * Randomizes chars from ASCII table and if Q -> QU
+ *  97 - 122 for all lowercase 
+ *  q = 113
+ */
+function buildRandomBoard(size){
+  let gameBoardToReturn = [];
+  for(let i =0; i < size; i++){
+    let currRowItems = [];
+    for(let k =0; k < size; k++){
+      currRowItems.push( Math.floor(Math.random() * (122 - 97) + 97));
+    }
+    gameBoardToReturn.push(falseRow);
+  }
+
+  return gameBoardToReturn;
+}
+
+function logger(...args){
+  for(let i = 0; i < args.length; i++){
+    console.log(`arg num ${i} == `, args[i])
+  }
+}
