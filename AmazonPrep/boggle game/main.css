@@ -3,7 +3,7 @@
   grid-template-columns: auto auto auto auto;
   gap: 10px;
   padding: 10px;
-  max-width : 400px;
+  width: 400px;
 }
 .boggle-board > div {
   background-color: #f7f7f8;
@@ -14,3 +14,20 @@
   border-radius: 2px;
 }
 
+.container {
+   display: grid;
+   grid-template-columns: auto auto;
+   gap: 10px;
+   justify-content: start;
+   align-items: center;
+}
+.playerInput{
+  display: grid;
+  grid-template-columns: auto;
+   gap: 10px;
+}
+
+.playerInput > textarea {
+  width: 400px;
+  border-radius: 2px;
+}
