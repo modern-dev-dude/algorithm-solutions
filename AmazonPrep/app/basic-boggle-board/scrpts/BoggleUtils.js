@@ -1,7 +1,11 @@
-const  loggerStringArgBuilder = (key, val) => `${key} == ${val}` 
-
-function checkFoSolution(boggleBoard, wordDictionary){
-  let solutions = []
+/**
+ * 
+ * @param {string} wordDictionary 
+ * @returns {Array<string>}
+ */
+export default function checkForSolution(boggleBoard,wordDictionary){
+  console.log(boggleBoard,wordDictionary)
+  let solutions = [];
   for(let wrdIdx = 0; wrdIdx < wordDictionary.length; wrdIdx++){
     // checks every item in graph
     for(let i = 0; i < boggleBoard.length; i++){
@@ -10,7 +14,6 @@ function checkFoSolution(boggleBoard, wordDictionary){
       for(let k = 0; k < boggleBoard.length; k++){
         // traverse cols 
         let isMatch = dfsIterative(boggleBoard, wordDictionary[wrdIdx], i, k);
-        // logger(`Char at ${i}, ${k}`, isMatch)
         if (isMatch){
           solutions.push(wordDictionary[wrdIdx]);
           break;
@@ -21,23 +24,24 @@ function checkFoSolution(boggleBoard, wordDictionary){
       }
     }
   }
-  logger(
-    loggerStringArgBuilder('solutions', solutions),
-    loggerStringArgBuilder('solutions.length', solutions.length),
-  )
-  return solutions.length > 0;
+  console.log(solutions)
+  return solutions;
 }
-
+// this implementation is limited , can only backtrack one letter 
 function dfsIterative(graphToSearch, wordToSearch,  startRow, startCol){
-  const adjRows = [0, -1, 1, 1, 0, -1, -1, -1 ];
+  const adjRows = [0, 1, 1, 1, 0, -1, -1, -1 ];
   const adjCols = [-1, -1, 0, 1, 1, 1, 0, -1 ];
   let currGraphRow = startRow;
   let currGraphCol = startCol;
   let currCharIdx = 0;
   let currCharInWordToCheck = wordToSearch.charAt(currCharIdx); 
   let currCharInGraph = graphToSearch[startRow][startCol];
+  let didBacktrackOneLetter = false;
+  let lastNodeVisited =[];
   const visistedSpots = createVisitedMatrix(graphToSearch);
   visistedSpots[startRow][startCol] = true;
+  console.log(visistedSpots)
+
   if(currCharInGraph !== currCharInWordToCheck){
         return false;
   }else {
@@ -49,25 +53,48 @@ function dfsIterative(graphToSearch, wordToSearch,  startRow, startCol){
         const adjRowLocation = adjRows[k] + currGraphRow;
         const adjColLocation = adjCols[k] + currGraphCol;
         // handle out of bounds exceptions in graph 
-        if( graphToSearch[adjRowLocation] === undefined || graphToSearch[adjRowLocation][adjColLocation] === undefined) continue; 
-
+        if( 
+          adjRowLocation < 0 || adjRowLocation >= graphToSearch.length || 
+          adjColLocation < 0 || adjColLocation >= graphToSearch.length) continue; 
         // check for matches 
         const currCharAdjToGraphLocation = graphToSearch[adjRowLocation][adjColLocation];
         // skip previously used node
-        if(visistedSpots[adjRowLocation][adjColLocation]){
-          continue;
+        if(!visistedSpots[adjRowLocation][adjColLocation]){
+          if(currCharAdjToGraphLocation === currCharInWordToCheck){
+              // store last node incase of backtracking
+              lastNodeVisited = [currGraphRow,currGraphCol];
+              didBacktrackOneLetter = false;
+              // recet adj char in loop for next char
+              // must set to -1 to account for the ++ from the for loop
+              k = -1;
+              currGraphRow = adjRowLocation;
+              currGraphCol = adjColLocation;
+              visistedSpots[adjRowLocation][adjColLocation] = true;
+              currCharIdx++;
+              currCharInWordToCheck= wordToSearch.charAt(currCharIdx); 
+              if(currCharIdx === wordToSearch.length) return true;
+            }
+      
         }
-       
-        if(currCharAdjToGraphLocation === currCharInWordToCheck){
-          // recet adj char in loop for next char
-          k = 0;
-          currGraphRow = adjRowLocation;
-          currGraphCol = adjColLocation;
-          visistedSpots[adjRowLocation][adjColLocation] = true;
-          currCharIdx++;
-          currCharInWordToCheck= wordToSearch.charAt(currCharIdx); 
-          if(currCharIdx === wordToSearch.length) return true;
-        }
+          // go back and check other matches for neighbor letters are the same
+        /**
+        * [I P N L]
+        * [E P G H]
+        * [G X X F]
+        * [R N C J]
+        * 
+        * ex inputs [ pgxe, pxgpe ] - need to check all possible paths   
+        */
+
+          if(k === adjRows.length - 1 && !didBacktrackOneLetter){
+            didBacktrackOneLetter =true;
+            currCharIdx--;
+            currCharInWordToCheck= wordToSearch.charAt(currCharIdx); 
+            k = -1;
+            // undo adj [7] [ -1 , -1] 
+            currGraphRow = lastNodeVisited[0];
+            currGraphCol = lastNodeVisited[1];
+          }
       }
       // if no match in adj then return false 
       return false;
@@ -92,47 +119,3 @@ function createVisitedMatrix(graphToSearch){
   }
   return matrixToReturn;
 }
-
-// checkFoSolution(testMatrix, testDictionary)
-
-function logger(...args){
-  for(let i = 0; i < args.length; i++){
-    console.log(`arg num ${i} == `, args[i])
-  }
-}
-
-/**
- * 
- * @param {number} size 
- * Randomizes chars from ASCII table and if Q -> QU
- *  97 - 122 for all lowercase 
- *  q = 113
- */
-function buildRandomBoard(size){
-  let gameBoardToReturn = [];
-  for(let i =0; i < size; i++){
-    let currRowItems = [];
-    for(let k =0; k < size; k++){
-      currRowItems.push( Math.floor(Math.random() * (122 - 97) + 97));
-    }
-    gameBoardToReturn.push(currRowItems);
-  }
-
-  return gameBoardToReturn;
-}
-
-function setUpGame(){
-  const newGameBoard = buildRandomBoard(4);
-  let innerHTMLStr = ''
-  // build inner HTML 
-  for(let i =0; i < newGameBoard.length; i++){
-    for(let k =0; k < newGameBoard[0].length; k++){
-      const currCharOnGrid = String.fromCharCode(newGameBoard[i][k]).toUpperCase();
-      const currCharToPlace = (currCharOnGrid === 'Q')?'Qu' : currCharOnGrid;
-      innerHTMLStr += `<div>${currCharToPlace}</div>`
-    }
-  }
-  document.getElementById('gameBoard').innerHTML = innerHTMLStr;
-}
-setUpGame();
-// build HTML 
