@@ -1,0 +1,53 @@
+.header {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 10px;
+  width: 400px;
+}
+.boggle-board {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  gap: 10px;
+  padding: 10px;
+  width: 400px;
+}
+.boggle-board > div {
+  background-color: #f7f7f8;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+  border: 1px solid #423E37;
+  border-radius: 2px;
+}
+
+.container {
+   display: grid;
+   grid-template-columns: auto auto;
+   gap: 10px;
+   justify-content: start;
+   align-items: center;
+   width: 850px;
+}
+.playerInput{
+  display: grid;
+  grid-template-columns: auto;
+   gap: 10px;
+}
+.playerInput > i {
+  font-size:  .75 rem;
+  max-width: 200px;
+}
+.playerInput > textarea {
+  width: 400px;
+  border-radius: 2px;
+}
+.playerInput > button {
+  width: 200px;
+  border-radius:5px;
+  height: 50px;
+  background-color:#04AA6D;
+  color:#FFF;
+  text-align:center;
+  vertical-align:middle;
+  border-color:#4cae4c;
+}
