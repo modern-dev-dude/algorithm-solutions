@@ -23,8 +23,12 @@
   Transactions should not bring DB to an invalid state. 
 - #### Isolation 
   operations wether concurrant or individual transactions should behave the same way  
-#### Durability 
+- #### Durability 
   commited transaction is written to non-volitile storage. It will not be undone in the event of crash, powerloss, or network partition
+- #### Replication
+  Replication is useful to allow lower latency and higher availability by maintainnig several versions of replicated data. The drawback is maintaining state of the DB servers in real time. 
+- #### Shareding
+  "Shards the DB into smaller partitions increasing throughput by pushing data to the shards and not dealing with unecessary data irrelavent to the operations. 
 
 
 
