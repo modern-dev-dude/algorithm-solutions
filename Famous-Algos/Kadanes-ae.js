@@ -26,11 +26,11 @@
  * [1,3,-2,3,4,7,2,-9,6,3] ->= max(15+3, num[i]) = 18
  * [1,3,-2,3,4,7,2,-9,6,3,1] ->= max(15+3 , num[i]) = 19 // curr Solution
  * [1,3,-2,3,4,7,2,-9,6,3,1,-5] ->= max(19-5 , num[i]) = 14
- * [1,3,-2,3,4,7,2,-9,6,3,1,-5,4] ->= max(114+4 , num[i]) = 18
+ * [1,3,-2,3,4,7,2,-9,6,3,1,-5,4] ->= max(14+4 , num[i]) = 18
  */
 
 
-function kandaneAlgo(arr, target){
+function kandaneAlgo(arr){
   let maxEnding =arr[0];
   let maxSoFar = arr[0];
   // no need to look at the index 0 because they are already initialized above
