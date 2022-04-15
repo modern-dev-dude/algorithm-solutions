@@ -1,27 +1,41 @@
 /**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
  * Time O(n)
  * Space O(N)
  */
- function levelOrder(root) {
-    const bstHeight = heightHelper(root);
+/**
+ * @param {TreeNode} root
+ * @return {number[][]}
+ */
+ var levelOrder = function(root) {
+    const bstHeight = getBstHeightHelper(root);
+    const res = [];
     for (let idx = 1; idx <= bstHeight; idx++){
-        printCurrLevel(root, idx);
+       res.push( printCurrLevel(root, idx, []));
     };
-}
+    return res;
+};
 
-function printCurrLevel(root, level){
-    if (root == null) return;
+
+function printCurrLevel(root, level , acc){
+    if (root == null) return acc;
     if(level == 1 ){
-        consolee.log(`${root.data} `);
+        acc.push(root.val);
     }else if(level > 1 ) {
-        printCurrLevel(root.left, level - 1);
-        printCurrLevel(root.right, level - 1);
+        printCurrLevel(root.left, level - 1, acc);
+        printCurrLevel(root.right, level - 1, acc);
     }
-    return;
+    return acc;
 }
     
 function getBstHeightHelper(rootNode){
-    // Write your code here.
     if(rootNode == null){
         return 0;
     }; 
