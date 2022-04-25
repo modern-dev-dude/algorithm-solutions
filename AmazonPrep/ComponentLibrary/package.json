@@ -1,16 +1,22 @@
 {
-  "name": "widgetbuilder",
+  "name": "@modern-dev-dude/customwidgetbuilder",
+  "private": false,
   "version": "0.0.1",
   "description": "libary to sidplay custom widgets on a screen",
-  "main": "index.ts",
   "packageManager": "yarn@3.2.0",
   "engines": {
     "node": ">=16.10.0",
     "yarn": ">=2.0.0",
     "npm": "please-use-yarn"
   },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup --config",
     "wipe-node": "./cmd-scripts/remove-node-modules-and-pack-lock.bat"
   },
   "author": "Modern Dev Dude LLC",
@@ -19,10 +25,17 @@
     "react": "^18.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-node-resolve": "^13.2.1",
+    "@rollup/plugin-typescript": "^8.3.2",
+    "@types/react": "^18.0.6",
     "autoprefixer": "^10.4.5",
     "postcss": "^8.4.12",
     "prettier": "^2.6.2",
+    "rollup": "^2.70.2",
+    "rollup-plugin-dts": "^4.2.1",
     "tailwindcss": "^3.0.24",
+    "tslib": "^2.4.0",
     "typescript": "^4.6.3"
   }
 }
