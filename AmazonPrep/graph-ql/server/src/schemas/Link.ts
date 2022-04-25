@@ -1,4 +1,4 @@
-import { extendType, objectType,nonNull, stringArg , intArg} from "nexus";
+import { extendType, objectType, nonNull, stringArg , intArg, list} from "nexus";
 import { NexusGenObjects } from "../../nexus-typegen";
 
 export const Link = objectType({
@@ -8,9 +8,12 @@ export const Link = objectType({
         t.nonNull.string("description"); 
         t.nonNull.string("url"); 
     },
+    nonNullDefaults:{
+        input:true,
+    }
 });
 
-let links: NexusGenObjects["Link"][]= [   // 1
+let links: NexusGenObjects["Link"][]= [   
     {
         id: 1,
         url: "www.howtographql.com",
@@ -39,7 +42,7 @@ export const LinkMutation = extendType({
     type:"Mutation",
     definition(t) {
         t.nonNull.field("post", {
-            type:"Link",
+            type:list("Link"),
             args:{
                 description: nonNull(stringArg()),
                 url: nonNull(stringArg())
@@ -57,41 +60,71 @@ export const LinkMutation = extendType({
                 }
                 // add new link to data source 
                 links.push(linkToAdd);
-                return linkToAdd;             
+                return links;             
             }
         }),
         t.nonNull.field("updateLink", {
-            type:"Link",
+            type:list("Link"),
             args:{
-                description: stringArg(),
-                url: stringArg(),
+                description: nonNull(stringArg()),
+                url: nonNull(stringArg()),
                 id: nonNull(intArg())
             },
     
             resolve(parent, args, context) {
-                const {description, url, id} = args;
-                const informationToUpdate = {description, url, id};
-                // return if no change is made
-                if(description?.length !== null && url?.length !== null ) return informationToUpdate;
-                links[id] = informationToUpdate;
-                // add new link to data source 
-                return informationToUpdate;             
+                const idxOfLinkToUpdate = links.findIndex(link => link.id === args.id)
+                if(args.description){
+                    links[idxOfLinkToUpdate].description = args.description
+                }
+                if(args.url){
+                    links[idxOfLinkToUpdate].url = args.url
+                }
+                return links;             
             }
-            }),
-
+        }),
         t.nonNull.field("deleteLink", {
-            type:"Link",
+            type:list("Link"),
             args:{
                 id: nonNull(intArg())
             },
-
             resolve(parent, args, context) {
-                const {id} = args;
-                const idxOfLinkToDelete = links.findIndex(link => link.id === id)
+                const idxOfLinkToDelete = links.findIndex(link => link.id === args.id)
                 links.splice(idxOfLinkToDelete,0);
+                console.log(links);
+                console.log(args.id);
                 // add new link to data source 
                 return links;             
             }
         })
     },
 })
+
+/**
+ * usage
+ * query {
+  feed {
+    id
+    url
+    description
+  }
+}
+mutation {
+  post(url: "www.prisma.io", description: "Next-generation Node.js and TypeScript ORM") {
+    id,description,url
+  }
+}
+
+mutation {
+  updateLink (url: "www.google.com", description: "Google search engine", id:2) {
+    id,description,url
+  }
+}
+
+mutation {
+  deleteLink(id: 2) {
+    id,description,url
+  }
+}
+
+
+ */
