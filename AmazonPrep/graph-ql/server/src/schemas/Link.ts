@@ -72,12 +72,11 @@ export const LinkMutation = extendType({
             },
     
             resolve(parent, args, context) {
-                const idxOfLinkToUpdate = links.findIndex(link => link.id === args.id)
-                if(args.description){
-                    links[idxOfLinkToUpdate].description = args.description
-                }
-                if(args.url){
-                    links[idxOfLinkToUpdate].url = args.url
+                const {description,id,url} = args;
+                const idxOfLinkToModify = findItemInArrayById(links,args.id);
+                // update datasource in place 
+                links[idxOfLinkToModify] = {
+                    description,id,url
                 }
                 return links;             
             }
@@ -88,43 +87,47 @@ export const LinkMutation = extendType({
                 id: nonNull(intArg())
             },
             resolve(parent, args, context) {
-                const idxOfLinkToDelete = links.findIndex(link => link.id === args.id)
-                links.splice(idxOfLinkToDelete,0);
-                console.log(links);
-                console.log(args.id);
-                // add new link to data source 
+                const idxOfLinkToModify = findItemInArrayById(links,args.id);
+                // remove 1 item ad found index 
+                links.splice(idxOfLinkToModify,1);
                 return links;             
             }
         })
     },
 })
 
+function findItemInArrayById(arrayOfItemsToSearch:Array<any>, id:number){
+    const idxOfLinkToUpdate = links.findIndex(link => link.id === id)
+    if(idxOfLinkToUpdate === -1) {
+        throw new Error(`Item with id ${id} cannont be found!`)
+    }
+    return idxOfLinkToUpdate
+}
+
 /**
  * usage
- * query {
-  feed {
-    id
-    url
-    description
-  }
-}
-mutation {
-  post(url: "www.prisma.io", description: "Next-generation Node.js and TypeScript ORM") {
-    id,description,url
-  }
-}
+ *  query {
+        feed {
+            id
+            url
+            description
+        }
+    }
+    mutation {
+        post(url: "www.prisma.io", description: "Next-generation Node.js and TypeScript ORM") {
+            id,description,url
+        }
+    }
 
-mutation {
-  updateLink (url: "www.google.com", description: "Google search engine", id:2) {
-    id,description,url
-  }
-}
+    mutation {
+        updateLink (url: "www.google.com", description: "Google search engine", id:2) {
+            id,description,url
+        }
+    }
 
-mutation {
-  deleteLink(id: 2) {
-    id,description,url
-  }
-}
-
-
+    mutation {
+        deleteLink(id: 2) {
+            id,description,url
+        }
+    }
  */
