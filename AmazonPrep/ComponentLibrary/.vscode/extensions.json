@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "oderwat.indent-rainbow",
+    "csstools.postcss",
+    "2gua.rainbow-brackets",
+    "aaron-bond.better-comments",
+    "donjayamanne.git-extension-pack",
+    "mhutchie.git-graph",
+    "byi8220.indented-block-highlighting",
+    "emmanuelbeziat.vscode-great-icons",
+    "zhuangtongfa.One-dark-pro",
+    "arcanis.vscode-zipfs",
+    "esbenp.prettier-vscode"
+  ]
+}
