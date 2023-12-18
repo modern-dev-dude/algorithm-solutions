@@ -1,8 +1,6 @@
 "use strict";
 // Complexity O(n+m)
 // only touch each element of each string once
-// Complexity O(n+m)
-// only touch each element of each string once
 // sliding window approach
 
 function anagramSearchInStringWithSlidingWindow(subStrToMatch, strToSearch) {
