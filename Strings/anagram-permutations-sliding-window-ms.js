@@ -4,116 +4,71 @@
 // Complexity O(n+m)
 // only touch each element of each string once
 // sliding window approach
-function anagramSearchInStringWithSlidingWindow(subStrToMatch, strToSearch){
-    const maxOccurranceMap = new Map(); // max occurances of values in substring
-    const lengthOfSubstring = subStrToMatch.length;
-    let countOfKeysInSubStrMatch = 0;
-    // build map of max occurences
-    for (let i = 0; i < subStrToMatch.length; i++) {
-      //set a map of each letter max occurances
-      let itemInMap = maxOccurranceMap.get(subStrToMatch[i]);
-      if (itemInMap === undefined) {
-        maxOccurranceMap.set(subStrToMatch[i], 1);
-        countOfKeysInSubStrMatch++;
-      } else {
-        maxOccurranceMap.set(subStrToMatch[i], itemInMap + 1);
-      }
+
+function anagramSearchInStringWithSlidingWindow(subStrToMatch, strToSearch) {
+  const maxOccurrenceMap = new Map(); // max occurrences of values in substring
+  // build map of max occurrences
+  for (let i = 0; i < subStrToMatch.length; i++) {
+    //set a map of each letter max occurrences
+    if (maxOccurrenceMap.get(subStrToMatch[i]) === undefined) {
+      maxOccurrenceMap.set(subStrToMatch[i], 1);
+    } else {
+      maxOccurrenceMap.set(
+        subStrToMatch[i],
+        maxOccurrenceMap.get(subStrToMatch[i]) + 1
+      );
     }
-  
-    let numOfValidSubstrings = 0;
-    let resultIdx = [];
-    let startIdxOfWindow = 0;
-    let matched = 0;
-    for (let i = 0; i < strToSearch.length ; i++) {
-  
-      const rightSideOfWindow = strToSearch[i];
-      if(maxOccurranceMap.get(rightSideOfWindow) !== undefined){
-        maxOccurranceMap.set(rightSideOfWindow, maxOccurranceMap.get(rightSideOfWindow)- 1);
-          if (maxOccurranceMap.get(rightSideOfWindow)  === 0) {
-              matched++;
-           }
-      }
-      // we could set the start indexes or num of valid results
-      if(matched === countOfKeysInSubStrMatch){
-          resultIdx[resultIdx.length] = startIdxOfWindow;
-          numOfValidSubstrings++;
-      }
-      // move window to left as needed
-      if(i >= lengthOfSubstring - 1){
-          // move window left
-          let leftChar = strToSearch[startIdxOfWindow];
-          startIdxOfWindow++;
-          const leftCharOccurences = maxOccurranceMap.get(leftChar); 
-          if(leftCharOccurences !== undefined){
-              if(leftCharOccurences === 0){
-              matched--;
-              }
-              maxOccurranceMap.set(leftChar, leftCharOccurences + 1)
-          }
-      }
-    }
-    console.log("resultIdx : " , resultIdx);
-    console.log("numOfValidSubstrings : " , numOfValidSubstrings);
-    document.getElementById(
-      "root"
-    ).innerHTML = `<p>String to search in: ${strToSearch}</p><p>Substring to match : ${subStrToMatch}</p><p>Number of Solutions Found : ${numOfValidSubstrings}</p>`;
   }
-  
-  
-  /**
-   * Test cases used
-   * uncomment out one at a time and answer appears on dom
-   */
-  anagramSearchInStringWithSlidingWindow("bbac", "abbadadbacdfdfacbbdaaabcba"); // sets dom to 2
-  // anagramSearchInStringWithSlidingWindow("bbac", "aaaaaaaaaaaaaaaaaaaaabbbccccabcb"); // sets dom to 1
-  // anagramSearchInStringWithSlidingWindow('bbac', 'abc'); // sets dom to 0
-  // anagramSearchInStringWithSlidingWindow('bbac', 'abcc'); // sets dom to 1
-  // anagramSearchInStringWithSlidingWindow('bbaac', 'bcaacb'); // sets dom to 0
-    
 
-// subStrToMatch = "bbac"          <--- size is m
-// strToTest     = "abbadadbacdfdf[acbb]daa[abcb]a"   <---- size is n
-//                  ^
-// strToTest     = "abbadadbacdfdf[acbb]daa[abcb]a"
-//abbadadbacdfdfacbbdaaabcba
-//                   ^  
-// O(nxm)
+  let resultIdx = [];
+  let startIdxOfWindow = 0;
+  let matched = 0;
 
-// aaaaabbbbc
-// Time O(n + m)
+  for (let i = 0; i < strToSearch.length; i++) {
+    const currRightChar = strToSearch.charAt(i);
+    // right slide
+    if (maxOccurrenceMap.get(currRightChar) !== undefined) {
+      maxOccurrenceMap.set(
+        strToSearch[i],
+        maxOccurrenceMap.get(currRightChar) - 1
+      );
+      if (maxOccurrenceMap.get(strToSearch.charAt(i)) === 0) {
+        matched++;
+      }
+    }
 
-//[abbadadbacdfdf[acbb]daa[abcb]a]
-// abb bba bada 
-// abb(a)bcaa
-// {
-// b : 0
-// a: 1
-// c: 1
-// }
-// a bbabcaa
-// 
-// 0 1 2 3  
-// set i = 3 instead of i = 1   
-// set i = 5 instead of i = 2   
+    // left
+    if (i >= subStrToMatch.length) {
+      const currLeftChar = strToSearch.charAt(startIdxOfWindow);
+      const currCharCount = maxOccurrenceMap.get(currLeftChar);
+      const nextCharCount = currCharCount + 1;
 
+      if (currCharCount !== undefined) {
+        maxOccurrenceMap.set(currLeftChar, nextCharCount);
+        if (matched > 0 && currCharCount === 0) {
+          matched--;
+        }
+      }
 
-//Find substring matches
-// Example 
-// not exact 
-// any order
-// inputs the char to match / string to test
-// will have 0 -< n matches 
-// inputs are strings 
-// iterate through the whole string 
-// combo of a, b, c 
-// [aaaa] 
-// a
-// bbac -> if match contiue idx 1 b
-// loop strToTest
-// on each letter loop subStrToMatch 
-// if there is a match then remove the letter from there 
-// [ bbac ] -> bbc -> bc -> c no match 
-// reset the strToMatch temp  
-// set 
-// abba no match 
-// [false, true, false ,false ]
+      startIdxOfWindow++;
+    }
+
+    if (matched === maxOccurrenceMap.size) {
+      resultIdx.push(startIdxOfWindow);
+    }
+  }
+
+  return resultIdx;
+}
+
+/**
+ * Test cases used
+ * uncomment out one at a time and answer appears on dom
+ */
+// anagramSearchInStringWithSlidingWindow("bbac", "abbadadbacdfdfacbbdaaabcba"); // results found 3
+// anagramSearchInStringWithSlidingWindow("bbac", "aaaaaaaaaaaaaaaaaaaaabbbccccabcb"); // results found  1
+// anagramSearchInStringWithSlidingWindow('bbac', 'abc'); // results found  0
+// anagramSearchInStringWithSlidingWindow('bbac', 'abcc'); // results found  1
+// anagramSearchInStringWithSlidingWindow('bbac', 'bcaacb'); // results found  0
+// anagramSearchInStringWithSlidingWindow("bbac", "aaaaaaabcbaaaaaaaabbcaaacbbaaabbbccccabcb"); // results found 7
+//anagramSearchInStringWithSlidingWindow('bac', 'asdadasdasdasdbbacasdasdasdasd');
